@@ -1,0 +1,12 @@
+Bugzilla: #{{ item.id }}
+Status: {{ item.status }}
+Assigned: {{ item.assigned_to }}
+Component: {{ item.component|join(', ') }}
+Target: {{ item.target_release|join(' ') }} {{ item.target_milestone }}
+Priority: {{ item.priority }}
+Severity: {{ item.severity }}
+Created: {{ item.creation_time }}
+Updated: {{ item.last_change_time }}
+Url: {{ source.config.url }}/show_bug.cgi?id={{ item.id }}
+
+{{ item.description }}

@@ -1,0 +1,37 @@
+Number: {{ item._number }}
+ChangeId: {{ item.change_id }}
+Status: {{ item.status }}
+Owner: {{ item.owner.name }} <{{ item.owner.email }}>
+Project: {{ item.project }}
+Branch: {{ item.branch }}
+Topic: {{ item.topic }}
+Mergeable: {{ item.mergeable }}
+Created: {{ item.created }}
+Updated: {{ item.updated }}
+Url: {{ source.config.url }}/{{ item._number }}
+
+{# item.args -#}
+Code-Review:
+{%- for c in item.labels['Code-Review']['all'] -%}
+    {%- if c['value'] != 0 %} {{ c['name'] }}{% if c['value'] > 0 -%}+{%- endif -%}{{ c['value'] }}
+    {%- endif -%}
+{%- endfor %}
+Verified:
+{%- for c in item.labels['Verified']['all'] -%}
+    {%- if c['value']|default(0) != 0 %} {{ c['name'] }}{% if c['value'] > 0 -%}+{%- endif -%}{{ c['value'] }}
+    {%- endif -%}
+{%- endfor %}
+{%- if 'Workflow' in item.labels -%}
+Workflow:
+{%- for c in item.labels['Workflow']['all'] -%}
+    {%- if c['value']|default(0) != 0 %} {{ c['name'] }}{% if c['value'] > 0 -%}+{%- endif -%}{{ c['value'] }}
+    {%- endif -%}
+{%- endfor %}
+{%- endif -%}
+{%- if 'Backport-Candidate' in item.labels -%}
+Backport-Candidate:
+{%- for c in item.labels.get('Backport-Candidate', {}).get('all', []) -%}
+    {%- if c['value']|default(0) != 0 %} {{ c['name'] }}{% if c['value'] > 0 -%}+{%- endif -%}{{ c['value'] }}
+    {%- endif -%}
+{%- endfor %}
+{%- endif -%}
