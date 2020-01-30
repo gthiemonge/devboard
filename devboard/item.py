@@ -4,6 +4,9 @@ from jinja2 import Environment, FileSystemLoader
 class Item(object):
     property_mapping = {}
 
+    label_colors = ()
+    default_label_color = 'blue'
+
     def __init__(self, source, **kwargs):
         self.source = source
         self.args = kwargs
@@ -32,3 +35,10 @@ class Item(object):
     @property
     def tags(self):
         return []
+
+    def label_color(self, label_name):
+        for pair in self.label_colors:
+            li, c = pair
+            if li in label_name:
+                return c
+        return self.default_label_color

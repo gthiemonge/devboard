@@ -2,19 +2,6 @@ import devboard.utils as utils
 import devboard.item as item
 
 
-label_colors = (
-    ('BC-', 'orange'),
-    ('BC+', 'lime'),
-    ('-', 'red'),
-    ('+', 'green'),
-    ('urgent', 'purple'),
-    ('high', 'red'),
-    ('medium', 'orange'),
-    ('low', 'green'),
-    ('', 'blue'),
-)
-
-
 class TrelloBoard(item.Item):
     pass
 
@@ -154,20 +141,16 @@ class Trello(object):
         self.board_dict[r['name']] = b
         return b
 
-    def label_create(self, board_id, label_name):
+    def label_create(self, board_id, label_name, label_color):
         self._labels(board_id)
         if label_name in self.label_dict[board_id]:
             return self.label_dict[board_id][label_name]
 
         params = {
             "name": label_name,
-            "idBoard": board_id
+            "idBoard": board_id,
+            "color": label_color
         }
-        for pair in label_colors:
-            li, c = pair
-            if li in label_name:
-                params['color'] = c
-                break
 
         self._auth_params(params)
 
@@ -281,8 +264,9 @@ class Trello(object):
         for tag in item.tags:
             board = self.list_boards[li.id]
             label = self.label_dict[board.id].get(tag)
+            color = item.label_color(tag)
             if not label:
-                label = self.label_create(board.id, tag)
+                label = self.label_create(board.id, tag, color)
             item_labels.append(label)
 
         items_label_ids = [

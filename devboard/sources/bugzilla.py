@@ -10,6 +10,13 @@ class BugzillaItem(Item):
         'update_time': 'last_change_time'
     }
 
+    label_colors = (
+        ('urgent', 'purple'),
+        ('high', 'red'),
+        ('medium', 'orange'),
+        ('low', 'green'),
+    )
+
     @property
     def tags(self):
         return {self.status,

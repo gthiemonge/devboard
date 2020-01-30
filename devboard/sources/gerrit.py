@@ -10,6 +10,13 @@ class GerritItem(Item):
         'summary': 'subject'
     }
 
+    label_colors = (
+        ('BC-', 'orange'),
+        ('BC+', 'lime'),
+        ('-', 'red'),
+        ('+', 'green'),
+    )
+
     def _label(self, label_name, shortname):
         ret = set()
         for cr in self.args['labels'].get(label_name, {}).get('all', []):
