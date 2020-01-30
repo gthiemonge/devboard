@@ -16,10 +16,16 @@ class GerritReviewItem(GerritItem):
                 return False
         return True
 
+    def _is_backport(self):
+        branch = self.args.get('branch')
+        if branch and branch != 'master':
+            return {'backport'}
+        return set()
+
     @property
     def tags(self):
         return ({self.review_tag} | self._code_review() | self._verified() |
-                self._workflow() | self._backport_candidate())
+                self._workflow() | self._backport_candidate() | self._is_backport())
 
 
 class OctaviaPriorityReviews(Source):
