@@ -1,4 +1,5 @@
 import argparse
+import logging
 import sys
 import time
 import yaml
@@ -9,6 +10,9 @@ import pkgutil
 import devboard.output as output
 import devboard.source as source
 import devboard.trello as trello
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class App(object):

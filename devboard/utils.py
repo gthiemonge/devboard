@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import re
 import stat
@@ -7,6 +8,12 @@ import time
 import urllib
 
 import requests
+
+
+LOG = logging.getLogger(__name__)
+
+urllib3_logger = logging.getLogger('urllib3')
+urllib3_logger.setLevel(logging.INFO)
 
 
 class HttpException(Exception):
@@ -36,14 +43,14 @@ class APICache(object):
                     return None
             if ttl == 0 or mtime + ttl >= now:
                 with open(path) as fp:
-                    # print(f'Reading from {path}')
+                    # LOG.debug(f'Reading from {path}')
                     return json.load(fp)
         return None
 
     def set(self, h, data):
         path = f'{self.cache_dir}/{h}.cache'
         with open(path, 'w') as fp:
-            # print(f'Writing to {path}')
+            # LOG.debug(f'Writing to {path}')
             fp.write(json.dumps(data))
 
     def digest(self, key):
@@ -89,28 +96,28 @@ def clean_url(url):
 
 @APICache('devboard')
 def get(url, **kwargs):
-    print("GET {}".format(clean_url(url)))
+    LOG.debug("GET {}".format(clean_url(url)))
     r = requests.get(url, **kwargs)
-    print("returned {}".format(r.status_code))
+    LOG.debug("returned {}".format(r.status_code))
     return handle_response(r)
 
 
 def post(url, **kwargs):
-    print("POST {}".format(clean_url(url)))
+    LOG.debug("POST {}".format(clean_url(url)))
     r = requests.post(url, **kwargs)
-    print("returned {}".format(r.status_code))
+    LOG.debug("returned {}".format(r.status_code))
     return handle_response(r)
 
 
 def put(url, **kwargs):
-    print("PUT {}".format(clean_url(url)))
+    LOG.debug("PUT {}".format(clean_url(url)))
     r = requests.put(url, **kwargs)
-    print("returned {}".format(r.status_code))
+    LOG.debug("returned {}".format(r.status_code))
     return handle_response(r)
 
 
 def delete(url, **kwargs):
-    print("DELETE {}".format(clean_url(url)))
+    LOG.debug("DELETE {}".format(clean_url(url)))
     r = requests.delete(url, **kwargs)
-    print("returned {}".format(r.status_code))
+    LOG.debug("returned {}".format(r.status_code))
     return handle_response(r)
