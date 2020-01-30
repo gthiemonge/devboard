@@ -1,0 +1,28 @@
+sources:
+    - name: rhbz
+      type: bugzilla
+      url: https://bugzilla.redhat.com
+      queries:
+          - status: [NEW, ASSIGNED, POST, MODIFIED, ON_DEV, ON_QA, VERIFIED, RELEASE_PENDING]
+            assigned_to: <user>@redhat.com
+
+    - name: opendev-review
+      type: gerrit
+      auth: opendev
+      url: https://review.opendev.org
+      queries:
+          - filter:
+              - status:open
+              - owner:<user>
+
+    - name: gerrithub
+      type: gerrit
+      url: https://review.gerrithub.io/
+      queries:
+          - filter:
+              - "status:open+owner:<user>"
+
+outputs:
+    - type: trello
+      board: <user>
+      auth: trello

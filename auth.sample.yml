@@ -1,0 +1,11 @@
+auth:
+    - name: rhbz
+      api_key: API_KEY
+
+    - name: opendev
+      username: USERNAME
+      password: PASSWORD
+
+    - name: trello
+      key: KEY
+      token: TOKEN
