@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 import time
 import yaml
@@ -23,8 +24,24 @@ class App(object):
         self.modules = {t: {}
                         for t in self.module_types}
 
+        if not config_file:
+            config_file = self._config_file('config.yml')
+        if not auth_file:
+            auth_file = self._config_file('auth.yml')
+
         self._read_config(config_file, auth_file)
         self._register_modules()
+
+    def _config_dir(self):
+        yield os.getcwd()
+        yield os.path.expanduser("~/.config/devboard/")
+
+    def _config_file(self, filename):
+        for d in self._config_dir():
+            path = os.path.join(d, filename)
+            if os.path.exists(path):
+                return path
+        return None
 
     def register(self, module_type, module):
         self.modules[module_type][module.name] = module
@@ -81,12 +98,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', metavar='interval', dest='interval',
                         type=int, default=-1)
-    parser.add_argument('config_file', type=str, default='config.yml')
-    parser.add_argument('auth_file', type=str, default='auth.yml')
+    parser.add_argument('-c', metavar='config_file',
+                        dest='config_file', type=str)
+    parser.add_argument('-a', metavar='auth_file',
+                        dest='auth_file', type=str)
 
     args = parser.parse_args()
 
-    app = App(args.config_file, args.auth_file)
+    app = App(config_file=args.config_file,
+              auth_file=args.auth_file)
 
     outputs = []
     for c in app.config['outputs']:
