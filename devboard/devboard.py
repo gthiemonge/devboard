@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import sys
 import time
 import yaml
 
@@ -10,7 +9,6 @@ import pkgutil
 
 import devboard.output as output
 import devboard.source as source
-import devboard.trello as trello
 
 
 LOG = logging.getLogger(__name__)
@@ -125,8 +123,8 @@ def main():
                     s = cls(c)
                     items = s.get()
 
-                    for output in outputs:
-                        output.set(c['name'], items)
+                    for o in outputs:
+                        o.set(c['name'], items)
                 except Exception as e:
                     LOG.error("Received exception {}".format(e))
             else:

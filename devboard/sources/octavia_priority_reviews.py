@@ -1,7 +1,6 @@
 import datetime
 import re
 
-from devboard.item import Item
 from devboard.source import Source
 from devboard.sources.gerrit import GerritItem
 import devboard.utils
@@ -25,7 +24,8 @@ class GerritReviewItem(GerritItem):
     @property
     def tags(self):
         return ({self.review_tag} | self._code_review() | self._verified() |
-                self._workflow() | self._backport_candidate() | self._is_backport())
+                self._workflow() | self._backport_candidate() |
+                self._is_backport())
 
 
 class OctaviaPriorityReviews(Source):
@@ -37,7 +37,8 @@ class OctaviaPriorityReviews(Source):
         self.user = config.get('username')
 
     def get(self):
-        url = "https://etherpad.openstack.org/p/octavia-priority-reviews/export/txt"
+        url = ("https://etherpad.openstack.org/p/octavia-priority-reviews/"
+               "export/txt")
 
         content = devboard.utils.get(url)
 
