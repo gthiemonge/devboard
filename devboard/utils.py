@@ -16,6 +16,10 @@ urllib3_logger = logging.getLogger('urllib3')
 urllib3_logger.setLevel(logging.INFO)
 
 
+class NetworkException(Exception):
+    pass
+
+
 class HttpException(Exception):
     pass
 
@@ -77,10 +81,10 @@ class APICache(object):
         return wrapper
 
 
-def handle_response(r):
+def _handle_response(r):
     if r.status_code >= 400:
         raise HttpException("Response code {}: {}".format(
-            r.status_code, r.text.split('\n', 1)[0]))
+            r.status_code, r.text.split('\n', 1)[0:10]))
     if r.headers.get('Content-Type').startswith('application/json'):
         if r.text.startswith(')]}'):
             data = r.text.split('\n', 1)[1]
@@ -89,35 +93,40 @@ def handle_response(r):
     return r.text
 
 
-def clean_url(url):
-    url = re.sub('(token|key)=([^&]*)(&|$)', '\\1=XXX\\3', url)
+def _clean_url(url):
+    url = re.sub('(token|key)=([^&]*)(&|$)', '\\1=<edited>\\3', url)
     return url
+
+
+def _request(method, url, **kwargs):
+    LOG.debug("{} {}".format(method,
+                             _clean_url(url)))
+
+    func = getattr(requests, method.lower())
+    try:
+        r = func(url, **kwargs)
+    except requests.exceptions.ConnectionError as e:
+        LOG.error("Error while requesting {} {}: {}".format(
+            method, _clean_url(url), e))
+        raise NetworkException("Cannot connect to remote server")
+
+    LOG.debug("returns {}".format(r.status_code))
+
+    return _handle_response(r)
 
 
 @APICache('devboard')
 def get(url, **kwargs):
-    LOG.debug("GET {}".format(clean_url(url)))
-    r = requests.get(url, **kwargs)
-    LOG.debug("returned {}".format(r.status_code))
-    return handle_response(r)
+    return _request('GET', url, **kwargs)
 
 
 def post(url, **kwargs):
-    LOG.debug("POST {}".format(clean_url(url)))
-    r = requests.post(url, **kwargs)
-    LOG.debug("returned {}".format(r.status_code))
-    return handle_response(r)
+    return _request('POST', url, **kwargs)
 
 
 def put(url, **kwargs):
-    LOG.debug("PUT {}".format(clean_url(url)))
-    r = requests.put(url, **kwargs)
-    LOG.debug("returned {}".format(r.status_code))
-    return handle_response(r)
+    return _request('PUT', url, **kwargs)
 
 
 def delete(url, **kwargs):
-    LOG.debug("DELETE {}".format(clean_url(url)))
-    r = requests.delete(url, **kwargs)
-    LOG.debug("returned {}".format(r.status_code))
-    return handle_response(r)
+    return _request('DELETE', url, **kwargs)

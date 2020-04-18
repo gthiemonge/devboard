@@ -13,6 +13,8 @@ import devboard.source as source
 import devboard.trello as trello
 
 
+LOG = logging.getLogger(__name__)
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -119,13 +121,17 @@ def main():
         for c in app.config['sources']:
             cls = app.get_module(App.SOURCE, c['type'])
             if cls:
-                s = cls(c)
-                items = s.get()
+                try:
+                    s = cls(c)
+                    items = s.get()
 
-                for output in outputs:
-                    output.set(c['name'], items)
+                    for output in outputs:
+                        output.set(c['name'], items)
+                except Exception as e:
+                    LOG.error("Received exception {}".format(e))
             else:
                 print("Cannot find module {}".format(c['type']))
+
         if args.interval < 0:
             break
 
